@@ -637,6 +637,46 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
   pointer-events: none;
 }
 
+
+/* Mobile media reliability: make dynamically loaded portfolio media visible
+   after the single-page view switches from hidden to active. */
+@media (max-width: 650px) {
+  body.dowa-view-portfolio .gallery {
+    width: 100%;
+    min-width: 0;
+  }
+  body.dowa-view-portfolio .gallery-item {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 240px;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.dowa-view-portfolio .gallery-item img,
+  body.dowa-view-portfolio .gallery-item video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 240px;
+    max-width: 100%;
+    object-fit: contain;
+    background: #111;
+  }
+  body.dowa-view-portfolio .gallery-item video {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  body.dowa-view-portfolio .gallery-item .gallery-caption {
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
 </style>
 </head>
 
@@ -1197,8 +1237,37 @@ setInterval(() => {
       const mimeType = String(row.media_type || "").toLowerCase().startsWith("video/") ? String(row.media_type).toLowerCase() : "";
       return `<video ${controls ? "controls" : ""} playsinline webkit-playsinline preload="auto" aria-label="${escapeHtml(altText || "DOWA Homes video")}"><source src="${url}"${mimeType ? ` type="${escapeHtml(mimeType)}"` : ""}></video>`;
     }
-    return `<img src="${url}" alt="${escapeHtml(altText)}" loading="lazy">`;
+    return `<img src="${url}" alt="${escapeHtml(altText)}" loading="eager" decoding="async">`;
   }
+
+
+// Re-check dynamically inserted media when the portfolio view becomes visible.
+// This also covers mobile browsers that defer image loading in hidden sections.
+function refreshDowaPortfolioMedia() {
+  if (!document.body.classList.contains('dowa-view-portfolio')) return;
+  document.querySelectorAll('.gallery-item img').forEach(image => {
+    image.loading = 'eager';
+    if (!image.complete || image.naturalWidth === 0) {
+      const source = image.getAttribute('src');
+      if (source) image.src = source;
+    }
+  });
+  document.querySelectorAll('.gallery-item video').forEach(video => {
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    if (video.readyState === 0) video.load();
+  });
+}
+document.addEventListener('click', event => {
+  const link = event.target.closest('a, button');
+  if (!link) return;
+  if (link.matches('a[href*="portfolio"], a[href="#work"], a[href="#projects"]')) {
+    window.setTimeout(refreshDowaPortfolioMedia, 120);
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshDowaPortfolioMedia();
+});
 
   try {
     if (!window.supabase?.createClient) {
