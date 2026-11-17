@@ -99,6 +99,9 @@ nav a:hover { color: var(--red); }
   font-weight: 700;
 }
 .socials a:hover { background: var(--red); color: white; }
+.socials a svg { width: 15px; height: 15px; display: block; fill: currentColor; }
+.socials a[aria-label="Instagram"] svg { fill: none; stroke: currentColor; stroke-width: 1.8; }
+.socials a[aria-label="WhatsApp"] svg { width: 16px; height: 16px; }
 
 .menu {
   display: none;
@@ -257,6 +260,41 @@ nav a:hover { color: var(--red); }
 .review-box h3 { font-family: 'Cormorant Garamond'; font-size: 23px; margin: 10px 0; }
 .review-box p { font-size: 13px; line-height: 1.8; color: #705b49; }
 .review-box small { display: block; margin-top: 20px; font-size: 9px; letter-spacing: 2px; }
+.review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.review-card { min-width: 0; padding: 24px; background: rgba(255,255,255,.42); border: 1px solid rgba(112,91,73,.14); }
+.review-card.review-extra[hidden] { display: none !important; }
+.review-card .quote { font-family: 'Cormorant Garamond'; font-size: 42px; line-height: 1; color: var(--red); }
+.review-card h3 { font-family: 'Cormorant Garamond'; font-size: 25px; margin: 8px 0; }
+.review-card p { font-size: 13px; line-height: 1.75; color: #705b49; overflow-wrap: anywhere; }
+.review-card small { display: block; margin-top: 16px; font-size: 9px; letter-spacing: 1.3px; line-height: 1.6; }
+.review-card .review-media { display: block; width: 100%; max-height: 220px; object-fit: cover; margin-top: 16px; }
+.review-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.review-actions button, .review-form button { min-height: 44px; padding: 12px 18px; border: 1px solid var(--brown); background: transparent; color: var(--brown); font: 700 12px 'DM Sans', sans-serif; }
+.review-actions button.primary, .review-form button.primary { background: var(--red); color: #fff; border-color: var(--red); }
+.review-form-wrap { margin-top: 26px; padding: 25px; background: #F7EEDF; border: 1px solid rgba(112,91,73,.18); }
+.review-form-wrap[hidden] { display: none !important; }
+.review-form-wrap h3 { font-family: 'Cormorant Garamond'; font-size: 27px; margin-bottom: 8px; }
+.review-form-wrap > p { font-size: 12px; line-height: 1.65; color: #765F4D; margin-bottom: 18px; }
+.review-form { display: grid; gap: 13px; }
+.review-form label { display: grid; gap: 6px; font-size: 11px; font-weight: 700; }
+.review-form input, .review-form textarea { width: 100%; min-height: 44px; padding: 12px; border: 1px solid #C7B69E; border-radius: 2px; background: #FFFCF6; color: var(--brown); font: 13px 'DM Sans', sans-serif; }
+.review-form textarea { min-height: 110px; resize: vertical; }
+.review-form button:disabled { opacity: .6; cursor: wait; }
+.review-form-status { min-height: 18px; font-size: 12px; line-height: 1.5; color: #4D3325; }
+.review-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+@media(max-width: 700px) { .review-list { grid-template-columns: 1fr; } .review-card { padding: 21px; } .review-box { padding: 24px; } }
+
+.review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.review-card { min-width: 0; padding: 26px; background: rgba(255,255,255,.34); border: 1px solid rgba(112,91,73,.14); }
+.review-card .quote { font-family: 'Cormorant Garamond'; font-size: 48px; color: var(--red); line-height: 1; }
+.review-card h3 { font-family: 'Cormorant Garamond'; font-size: 23px; margin: 8px 0 10px; }
+.review-card p { font-size: 13px; line-height: 1.8; color: #705b49; }
+.review-card small { display: block; margin-top: 16px; font-size: 9px; letter-spacing: 1.5px; line-height: 1.7; }
+.review-card .review-media { display: block; width: 100%; max-height: 220px; object-fit: cover; margin-top: 18px; }
+@media(max-width: 700px) {
+  .review-list { grid-template-columns: 1fr; }
+  .review-card { padding: 22px; }
+}
 
 /* CTA */
 .cta {
@@ -491,6 +529,7 @@ header nav a:hover::after, header nav a:focus-visible::after {
 .gallery-caption { padding: 52px 19px 18px; }
 
 .reviews { background: #FBF5EA; padding: 82px 8%; gap: 55px; }
+.reviews-content { min-width: 0; }
 .reviews-intro h2 { font-size: clamp(42px, 5vw, 60px); line-height: .98; }
 .reviews-intro p { color: #765F4D; font-size: 14px; }
 .review-box { border: 0; border-left: 3px solid var(--red); border-radius: 4px; background: #F0E4D3; padding: 38px 42px; }
@@ -638,45 +677,14 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
 }
 
 
-/* Mobile media reliability: make dynamically loaded portfolio media visible
-   after the single-page view switches from hidden to active. */
-@media (max-width: 650px) {
-  body.dowa-view-portfolio .gallery {
-    width: 100%;
-    min-width: 0;
-  }
-  body.dowa-view-portfolio .gallery-item {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    min-height: 240px;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  body.dowa-view-portfolio .gallery-item img,
-  body.dowa-view-portfolio .gallery-item video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    min-height: 240px;
-    max-width: 100%;
-    object-fit: contain;
-    background: #111;
-  }
-  body.dowa-view-portfolio .gallery-item video {
-    position: relative;
-    z-index: 2;
-    pointer-events: auto;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
-  }
-  body.dowa-view-portfolio .gallery-item .gallery-caption {
-    z-index: 1;
-    pointer-events: none;
-  }
+/* Reliable media sizing and native touch playback across narrow phone screens. */
+.gallery-item video { display: block; width: 100%; height: 100%; min-height: 220px; object-fit: cover; background: #171412; }
+.gallery-item video::-webkit-media-controls { opacity: 1; }
+@media(max-width: 700px) {
+  .gallery-item video { min-height: 210px; max-height: 360px; object-fit: contain; }
+  .lightbox { padding: 12px; }
+  .lightbox video { max-width: 96vw !important; max-height: 78vh !important; }
 }
-
 </style>
 </head>
 
@@ -699,10 +707,10 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
   </nav>
 
   <div class="header-right">
-    <div class="socials">
-      <a href="https://web.facebook.com/profile.php?id=61583184129201" target="_blank">f</a>
-      <a href="https://www.instagram.com/dowa_homes/" target="_blank">◎</a>
-      <a href="https://www.tiktok.com/@dowahome?lang=en" target="_blank">♪</a>
+    <div class="socials" aria-label="DOWA Homes social media">
+      <a href="https://web.facebook.com/profile.php?id=61583184129201" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2H7.3V13h2.8v8h3.4Z"/></svg></a>
+      <a href="https://www.instagram.com/dowa_homes/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.8" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="https://www.tiktok.com/@dowahome?lang=en" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 3h-3.1v12.1a3.1 3.1 0 1 1-2.7-3.1V8.8a6.2 6.2 0 1 0 5.8 6.2V9a8.1 8.1 0 0 0 4.8 1.6V7.4c-2.6-.1-4.5-1.8-4.8-4.4Z"/></svg></a>
     </div>
     <a class="btn btn-red" href="https://wa.me/2348164989290">Get a Quote ↗</a>
   </div>
@@ -904,11 +912,29 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
     <p>Experiences from the people who have welcomed DOWA Homes into their spaces.</p>
   </div>
 
-  <div class="review-box">
-    <div class="quote">“</div>
-    <h3>Client stories belong here.</h3>
-    <p>Customer video reviews, photographs and written testimonials will appear in this section once supplied and approved by DOWA Homes.</p>
-    <small>PUBLISHED WITH CUSTOMER PERMISSION</small>
+  <div class="reviews-content">
+    <div class="review-box">
+      <div class="quote">“</div>
+      <h3>Client stories belong here.</h3>
+      <p>Customer video reviews, photographs and written testimonials will appear in this section once supplied and approved by DOWA Homes.</p>
+      <small>PUBLISHED WITH CUSTOMER PERMISSION</small>
+    </div>
+    <div class="review-actions">
+      <button type="button" class="primary" id="viewAllReviews" hidden>View All Reviews</button>
+      <button type="button" id="writeReviewButton">Write a Review</button>
+    </div>
+    <div class="review-form-wrap" id="reviewFormWrap" hidden>
+      <h3>Share your DOWA Homes experience</h3>
+      <p>Your review will be checked by our team before it appears publicly.</p>
+      <form class="review-form" id="publicReviewForm">
+        <label>Your name<input name="client_name" type="text" maxlength="80" autocomplete="name" required placeholder="Enter your name"></label>
+        <label>How would you describe yourself? <span>(optional)</span><input name="client_role" type="text" maxlength="80" placeholder="e.g. Customer"></label>
+        <label>Your review<textarea name="review_text" maxlength="1200" required placeholder="Tell us about your experience with DOWA Homes..."></textarea></label>
+        <label class="review-honeypot" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        <button class="primary" type="submit">Submit Review</button>
+        <p class="review-form-status" id="reviewFormStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -955,11 +981,11 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
       <a href="#contact">Contact</a>
     </nav>
 
-    <div class="socials">
-      <a href="https://web.facebook.com/profile.php?id=61583184129201" target="_blank">f</a>
-      <a href="https://www.instagram.com/dowa_homes/" target="_blank">◎</a>
-      <a href="https://www.tiktok.com/@dowahome?lang=en" target="_blank">♪</a>
-      <a href="https://wa.me/2348164989290" target="_blank">◉</a>
+    <div class="socials" aria-label="DOWA Homes social media">
+      <a href="https://web.facebook.com/profile.php?id=61583184129201" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2H7.3V13h2.8v8h3.4Z"/></svg></a>
+      <a href="https://www.instagram.com/dowa_homes/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.8" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="https://www.tiktok.com/@dowahome?lang=en" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 3h-3.1v12.1a3.1 3.1 0 1 1-2.7-3.1V8.8a6.2 6.2 0 1 0 5.8 6.2V9a8.1 8.1 0 0 0 4.8 1.6V7.4c-2.6-.1-4.5-1.8-4.8-4.4Z"/></svg></a>
+      <a href="https://wa.me/2348164989290" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2a9.7 9.7 0 0 0-8.3 14.7L2.4 22l5.2-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.7a8 8 0 0 1-4.1-1.1l-.3-.2-3.1.8.8-3-.2-.3A8 8 0 1 1 12 19.9Zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.2 0-.3 0-.5l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .2-1.1-.1-.1-.3-.2-.5-.3Z"/></svg></a>
     </div>
   </div>
 
@@ -975,7 +1001,7 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
 <div class="lightbox" id="lightbox">
   <button id="closeLightbox" aria-label="Close">×</button>
   <img id="lightboxImage" src="" alt="Furniture preview">
-  <video id="lightboxVideo" controls playsinline preload="metadata" style="display:none;max-width:90vw;max-height:85vh;width:auto;height:auto"></video>
+  <video id="lightboxVideo" controls playsinline webkit-playsinline preload="metadata" style="display:none;max-width:90vw;max-height:85vh;width:auto;height:auto"></video>
 </div>
 
 <script>
@@ -1230,44 +1256,18 @@ setInterval(() => {
     return firstImage?.media_url || "";
   }
 
-  function mediaElement(row, altText = "", controls = true) {
+  function mediaElement(row, altText = "", controls = true, posterUrl = "") {
     if (!row?.media_url) return "";
     const url = escapeHtml(row.media_url);
     if (isVideoMedia(row)) {
-      const mimeType = String(row.media_type || "").toLowerCase().startsWith("video/") ? String(row.media_type).toLowerCase() : "";
-      return `<video ${controls ? "controls" : ""} playsinline webkit-playsinline preload="auto" aria-label="${escapeHtml(altText || "DOWA Homes video")}"><source src="${url}"${mimeType ? ` type="${escapeHtml(mimeType)}"` : ""}></video>`;
+      const poster = posterUrl ? ` poster="${escapeHtml(posterUrl)}"` : "";
+      // Use the video element's own src. Avoid forcing CORS mode or a MIME type
+      // copied from database metadata: either can make otherwise playable files
+      // fail on some mobile browsers and storage/CDN configurations.
+      return `<video ${controls ? "controls" : ""} playsinline webkit-playsinline preload="metadata"${poster} src="${url}" data-dowa-video="true" aria-label="${escapeHtml(altText || "DOWA Homes video")}"></video>`;
     }
-    return `<img src="${url}" alt="${escapeHtml(altText)}" loading="eager" decoding="async">`;
+    return `<img src="${url}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">`;
   }
-
-
-// Re-check dynamically inserted media when the portfolio view becomes visible.
-// This also covers mobile browsers that defer image loading in hidden sections.
-function refreshDowaPortfolioMedia() {
-  if (!document.body.classList.contains('dowa-view-portfolio')) return;
-  document.querySelectorAll('.gallery-item img').forEach(image => {
-    image.loading = 'eager';
-    if (!image.complete || image.naturalWidth === 0) {
-      const source = image.getAttribute('src');
-      if (source) image.src = source;
-    }
-  });
-  document.querySelectorAll('.gallery-item video').forEach(video => {
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    if (video.readyState === 0) video.load();
-  });
-}
-document.addEventListener('click', event => {
-  const link = event.target.closest('a, button');
-  if (!link) return;
-  if (link.matches('a[href*="portfolio"], a[href="#work"], a[href="#projects"]')) {
-    window.setTimeout(refreshDowaPortfolioMedia, 120);
-  }
-});
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) refreshDowaPortfolioMedia();
-});
 
   try {
     if (!window.supabase?.createClient) {
@@ -1354,7 +1354,8 @@ document.addEventListener('visibilitychange', () => {
         const category = normalCategory(project.category || project.name);
         return entries.map(entry => {
           const isVideo = isVideoMedia(entry);
-          const content = mediaElement(entry, project.name, true);
+          const posterUrl = project.cover_image_url || "";
+          const content = mediaElement(entry, project.name, true, posterUrl);
           const caption = `<span class="gallery-caption"><strong>${escapeHtml(project.name)}</strong><small>${isVideo ? "PROJECT VIDEO" : "COMPLETED PROJECT"}</small></span>`;
           return isVideo
             ? `<div class="gallery-item" data-category="${escapeHtml(category)}">${content}${caption}</div>`
@@ -1389,22 +1390,76 @@ document.addEventListener('visibilitychange', () => {
       }
     }
 
-    // Reviews: show the most recent published testimonial in the existing review panel.
-    if (reviews.length) {
-      const review = reviews[0];
+    // Show only two reviews on the homepage; visitors can expand the full list.
+    const reviewMarkup = reviews.map((review, index) => {
       const attached = reviewMedia.filter(row => String(row.testimonial_id) === String(review.id));
       const reviewMediaItem = firstMedia(attached);
       const mediaMarkup = reviewMediaItem
-        ? `${mediaElement(reviewMediaItem, "Client testimonial", true).replace("<video ", '<video style="width:100%;max-height:220px;object-fit:cover;margin-top:18px" ').replace("<img ", '<img style="width:100%;max-height:220px;object-fit:cover;margin-top:18px" ')}`
+        ? mediaElement(reviewMediaItem, "Client testimonial", true).replace("<video ", '<video class="review-media" ').replace("<img ", '<img class="review-media" ')
         : "";
-      document.querySelector(".review-box").innerHTML = `
+      return `<article class="review-card${index > 1 ? ' review-extra' : ''}" ${index > 1 ? 'hidden' : ''}>
         <div class="quote">“</div>
         <h3>${escapeHtml(review.client_name || "DOWA Homes Client")}</h3>
         <p>${escapeHtml(review.review_text || "")}</p>
         ${mediaMarkup}
         <small>${escapeHtml(review.client_role || "DOWA HOMES CLIENT")} · PUBLISHED WITH CUSTOMER PERMISSION</small>
-      `;
+      </article>`;
+    }).join("");
+    const reviewBox = document.querySelector(".review-box");
+    if (reviewBox) reviewBox.innerHTML = reviewMarkup ? `<div class="review-list">${reviewMarkup}</div>` : `<p>Be the first to share your experience with DOWA Homes.</p>`;
+    const viewAllReviews = document.getElementById("viewAllReviews");
+    if (viewAllReviews) {
+      viewAllReviews.hidden = reviews.length <= 2;
+      viewAllReviews.addEventListener("click", () => {
+        const extras = document.querySelectorAll(".review-card.review-extra");
+        const opening = viewAllReviews.dataset.expanded !== "true";
+        extras.forEach(card => { card.hidden = !opening; });
+        viewAllReviews.dataset.expanded = String(opening);
+        viewAllReviews.textContent = opening ? "Show Fewer Reviews" : "View All Reviews";
+      });
     }
+
+    const writeReviewButton = document.getElementById("writeReviewButton");
+    const reviewFormWrap = document.getElementById("reviewFormWrap");
+    const publicReviewForm = document.getElementById("publicReviewForm");
+    const reviewFormStatus = document.getElementById("reviewFormStatus");
+    writeReviewButton?.addEventListener("click", () => {
+      reviewFormWrap.hidden = !reviewFormWrap.hidden;
+      if (!reviewFormWrap.hidden) reviewFormWrap.scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+    publicReviewForm?.addEventListener("submit", async event => {
+      event.preventDefault();
+      const values = new FormData(publicReviewForm);
+      if (values.get("website")) return;
+      const clientName = String(values.get("client_name") || "").trim();
+      const clientRole = String(values.get("client_role") || "").trim();
+      const reviewText = String(values.get("review_text") || "").trim();
+      if (!clientName || !reviewText) {
+        reviewFormStatus.textContent = "Please enter your name and review.";
+        return;
+      }
+      const submitButton = publicReviewForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting…";
+      reviewFormStatus.textContent = "";
+      try {
+        const { error } = await db.from("testimonials").insert({
+          client_name: clientName,
+          client_role: clientRole || null,
+          review_text: reviewText,
+          status: "draft"
+        });
+        if (error) throw error;
+        publicReviewForm.reset();
+        reviewFormStatus.textContent = "Thank you! Your review has been submitted and will appear after DOWA Homes approves it.";
+      } catch (error) {
+        console.error("DOWA Homes review submission failed:", error);
+        reviewFormStatus.textContent = "We couldn't submit your review just now. Please try again later.";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Review";
+      }
+    });
 
     console.info("DOWA Homes: published content loaded from Supabase.", {
       catalogue: catalogue.length,
@@ -1539,6 +1594,38 @@ document.addEventListener('visibilitychange', () => {
   });
 
   setDowaView(false);
+})();
+</script>
+
+<script id="dowa-video-mobile-playback">
+(function () {
+  // Do not draw cross-origin video frames to canvas: that can fail on storage
+  // hosts without permissive CORS headers. Use the project's cover image as a
+  // poster when available; otherwise the browser displays its decoded frame.
+  function prepare(video) {
+    if (!video || video.dataset.dowaPrepared) return;
+    video.dataset.dowaPrepared = "true";
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.preload = "metadata";
+    video.addEventListener("error", function () {
+      console.error("DOWA video playback failed", {
+        source: video.currentSrc || video.src,
+        code: video.error?.code,
+        message: video.error?.message
+      });
+    });
+    // Explicitly reload after the dynamic gallery has inserted the media URL.
+    if (video.readyState === 0) video.load();
+  }
+  function scan(root = document) {
+    root.querySelectorAll?.(".gallery video[data-dowa-video]").forEach(prepare);
+  }
+  scan();
+  const gallery = document.querySelector(".gallery");
+  if (gallery && window.MutationObserver) {
+    new MutationObserver(() => scan(gallery)).observe(gallery, { childList: true, subtree: true });
+  }
 })();
 </script>
 
