@@ -685,6 +685,163 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
   .lightbox { padding: 12px; }
   .lightbox video { max-width: 96vw !important; max-height: 78vh !important; }
 }
+
+/* CATALOGUE-ONLY FIX: multi-image product gallery and visible pricing */
+.products .product-image.catalogue-gallery {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #e9dfd2;
+}
+.catalogue-gallery .catalogue-gallery-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.catalogue-gallery .catalogue-gallery-track::-webkit-scrollbar { display: none; }
+.catalogue-gallery .catalogue-gallery-slide {
+  display: block;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.catalogue-gallery .catalogue-gallery-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.catalogue-gallery .catalogue-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,253,248,.92);
+  color: #4D3325;
+  font-size: 22px;
+  line-height: 1;
+  box-shadow: 0 2px 10px rgba(0,0,0,.14);
+}
+.catalogue-gallery .catalogue-gallery-prev { left: 10px; }
+.catalogue-gallery .catalogue-gallery-next { right: 10px; }
+.catalogue-gallery .catalogue-gallery-dots {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.catalogue-gallery .catalogue-gallery-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.65);
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+.catalogue-gallery .catalogue-gallery-dot.active {
+  width: 18px;
+  border-radius: 8px;
+  background: #fff;
+}
+.products .product-price {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: var(--red) !important;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.products .product-price-on-request {
+  display: block;
+  margin: 8px 0 4px;
+  color: #806c5b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* Catalogue product lightbox navigation */
+.lightbox.catalogue-view { touch-action: pan-y; }
+.lightbox.catalogue-view #lightboxImage {
+  max-width: min(82vw, 1200px);
+  max-height: 84vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.lightbox-gallery-nav {
+  display: none;
+  position: absolute;
+  z-index: 302;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,253,248,.94);
+  color: #4D3325;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox.catalogue-view .lightbox-gallery-nav { display: flex; }
+.lightbox-gallery-prev { left: 22px; }
+.lightbox-gallery-next { right: 22px; }
+.lightbox-gallery-count {
+  display: none;
+  position: absolute;
+  z-index: 302;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  background: rgba(0,0,0,.45);
+  border-radius: 20px;
+  padding: 7px 12px;
+  font-size: 12px;
+  letter-spacing: .4px;
+}
+.lightbox.catalogue-view .lightbox-gallery-count { display: block; }
+@media (max-width: 650px) {
+  .lightbox { padding: 14px; }
+  .lightbox.catalogue-view #lightboxImage {
+    max-width: 94vw;
+    max-height: 82vh;
+  }
+  .lightbox-gallery-prev { left: 8px; }
+  .lightbox-gallery-next { right: 8px; }
+  .lightbox-gallery-nav { width: 38px; height: 38px; font-size: 27px; }
+}
+
 </style>
 </head>
 
@@ -1000,8 +1157,11 @@ body.dowa-view-portfolio .work .dowa-view-all-wrap {
 <!-- IMAGE LIGHTBOX -->
 <div class="lightbox" id="lightbox">
   <button id="closeLightbox" aria-label="Close">×</button>
+  <button class="lightbox-gallery-nav lightbox-gallery-prev" id="lightboxGalleryPrev" type="button" aria-label="Previous product image">‹</button>
   <img id="lightboxImage" src="" alt="Furniture preview">
   <video id="lightboxVideo" controls playsinline webkit-playsinline preload="metadata" style="display:none;max-width:90vw;max-height:85vh;width:auto;height:auto"></video>
+  <button class="lightbox-gallery-nav lightbox-gallery-next" id="lightboxGalleryNext" type="button" aria-label="Next product image">›</button>
+  <div class="lightbox-gallery-count" id="lightboxGalleryCount" aria-live="polite"></div>
 </div>
 
 <script>
@@ -1053,7 +1213,65 @@ const lightboxImage = document.getElementById('lightboxImage');
 
 const lightboxVideo = document.getElementById('lightboxVideo');
 
+let activeCatalogueLightboxImages = [];
+let activeCatalogueLightboxIndex = 0;
+let catalogueLightboxTouchStartX = null;
+
+function updateCatalogueLightboxImage() {
+  if (!activeCatalogueLightboxImages.length) return;
+  const image = activeCatalogueLightboxImages[activeCatalogueLightboxIndex];
+  lightboxImage.src = image.url;
+  lightboxImage.alt = image.alt || "Furniture image";
+  const counter = document.getElementById("lightboxGalleryCount");
+  if (counter) counter.textContent = `${activeCatalogueLightboxIndex + 1} / ${activeCatalogueLightboxImages.length}`;
+}
+
+function showCatalogueLightbox(images, startIndex, alt) {
+  activeCatalogueLightboxImages = images.map((url, index) => ({
+    url,
+    alt: `${alt || "Furniture"} — image ${index + 1}`
+  }));
+  activeCatalogueLightboxIndex = Math.max(0, Math.min(startIndex, activeCatalogueLightboxImages.length - 1));
+  lightboxVideo.pause();
+  lightboxVideo.removeAttribute("src");
+  lightboxVideo.load();
+  lightboxVideo.style.display = "none";
+  lightboxImage.style.display = "block";
+  lightbox.classList.add("catalogue-view");
+  updateCatalogueLightboxImage();
+  lightbox.classList.add("open");
+}
+
+function moveCatalogueLightboxImage(direction) {
+  if (!activeCatalogueLightboxImages.length) return;
+  const count = activeCatalogueLightboxImages.length;
+  activeCatalogueLightboxIndex = (activeCatalogueLightboxIndex + direction + count) % count;
+  updateCatalogueLightboxImage();
+}
+
+document.getElementById("lightboxGalleryPrev").addEventListener("click", event => {
+  event.stopPropagation();
+  moveCatalogueLightboxImage(-1);
+});
+document.getElementById("lightboxGalleryNext").addEventListener("click", event => {
+  event.stopPropagation();
+  moveCatalogueLightboxImage(1);
+});
+lightbox.addEventListener("touchstart", event => {
+  if (!lightbox.classList.contains("catalogue-view") || !event.touches.length) return;
+  catalogueLightboxTouchStartX = event.touches[0].clientX;
+}, { passive: true });
+lightbox.addEventListener("touchend", event => {
+  if (!lightbox.classList.contains("catalogue-view") || catalogueLightboxTouchStartX === null || !event.changedTouches.length) return;
+  const deltaX = event.changedTouches[0].clientX - catalogueLightboxTouchStartX;
+  catalogueLightboxTouchStartX = null;
+  if (Math.abs(deltaX) < 40) return;
+  moveCatalogueLightboxImage(deltaX < 0 ? 1 : -1);
+}, { passive: true });
+
 function showImage(source, alt) {
+  lightbox.classList.remove("catalogue-view");
+  activeCatalogueLightboxImages = [];
   lightboxVideo.pause();
   lightboxVideo.removeAttribute('src');
   lightboxVideo.load();
@@ -1065,6 +1283,8 @@ function showImage(source, alt) {
 }
 
 function showVideo(source, alt) {
+  lightbox.classList.remove("catalogue-view");
+  activeCatalogueLightboxImages = [];
   lightboxImage.removeAttribute('src');
   lightboxImage.style.display = 'none';
   lightboxVideo.style.display = 'block';
@@ -1091,7 +1311,9 @@ document.querySelectorAll('.gallery-item').forEach(item => {
 });
 
 function closeImage() {
-  lightbox.classList.remove('open');
+  lightbox.classList.remove('open', 'catalogue-view');
+  activeCatalogueLightboxImages = [];
+  activeCatalogueLightboxIndex = 0;
   lightboxImage.src = '';
   lightboxImage.style.display = 'block';
   lightboxVideo.pause();
@@ -1109,6 +1331,10 @@ lightbox.addEventListener('click', event => {
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') closeImage();
+  if (lightbox.classList.contains("open") && lightbox.classList.contains("catalogue-view")) {
+    if (event.key === 'ArrowLeft') moveCatalogueLightboxImage(-1);
+    if (event.key === 'ArrowRight') moveCatalogueLightboxImage(1);
+  }
 });
 
 // Homepage hero supports featured project images and videos.
@@ -1301,22 +1527,59 @@ setInterval(() => {
       db.from("testimonial_media").select("*").order("position", { ascending: true })
     ]);
 
-    // Catalogue: replace the sample cards only when published admin catalogue records exist.
+    // Catalogue: render all uploaded product images in a swipeable gallery.
     if (catalogue.length) {
+      function formatCataloguePrice(item) {
+        // The admin form saves `price`; aliases keep older catalogue rows readable.
+        const candidates = [item.price, item.price_ngn, item.selling_price, item.amount];
+        const raw = candidates.find(value => value !== null && value !== undefined && String(value).trim() !== "");
+        if (raw === undefined) return "";
+        if (typeof raw === "number" || /^-?\d+(?:\.\d+)?$/.test(String(raw).trim())) {
+          const amount = Number(raw);
+          return Number.isFinite(amount) && amount >= 0
+            ? `₦${amount.toLocaleString("en-NG", {maximumFractionDigits: 2})}`
+            : "";
+        }
+        // If a legacy row already stores a formatted currency string, display it as entered.
+        const text = String(raw).trim();
+        return /₦|NGN/i.test(text) ? text : "";
+      }
+
       const productMarkup = catalogue.map(item => {
-        const media = catalogueMedia.filter(row => String(row.catalogue_id) === String(item.id));
-        const image = imageFor(media);
+        const media = catalogueMedia
+          .filter(row => String(row.catalogue_id) === String(item.id) && row.media_url)
+          .sort((a, b) => Number(a.position || 0) - Number(b.position || 0));
+        const images = media.filter(row => !isVideoMedia(row));
         const firstVideo = media.find(isVideoMedia);
         const category = normalCategory(item.category);
-        const imageMarkup = image
-          ? `<a class="product-image preview" href="${escapeHtml(image)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy"></a>`
-          : firstVideo
-            ? `<div class="product-image">${mediaElement(firstVideo, item.name, true)}</div>`
-            : `<div class="product-image"><div style="height:100%;display:grid;place-items:center;color:#806c5b;font-size:12px">Image coming soon</div></div>`;
+
+        let imageMarkup = "";
+        if (images.length) {
+          const slides = images.map((row, index) =>
+            `<button type="button" class="catalogue-gallery-slide" data-catalogue-slide="${index}" aria-label="View ${escapeHtml(item.name)} image ${index + 1}">
+              <img src="${escapeHtml(row.media_url)}" alt="${escapeHtml(item.name)} — image ${index + 1}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async">
+            </button>`
+          ).join("");
+          const controls = images.length > 1
+            ? `<button type="button" class="catalogue-gallery-arrow catalogue-gallery-prev" aria-label="Previous product image">‹</button>
+               <button type="button" class="catalogue-gallery-arrow catalogue-gallery-next" aria-label="Next product image">›</button>
+               <div class="catalogue-gallery-dots" aria-label="Product image position">${images.map((_, index) => `<span class="catalogue-gallery-dot${index === 0 ? " active" : ""}" data-catalogue-dot="${index}"></span>`).join("")}</div>`
+            : "";
+          imageMarkup = `<div class="product-image catalogue-gallery" data-catalogue-gallery>
+            <div class="catalogue-gallery-track">${slides}</div>${controls}
+          </div>`;
+        } else if (firstVideo) {
+          imageMarkup = `<div class="product-image">${mediaElement(firstVideo, item.name, true)}</div>`;
+        } else {
+          imageMarkup = `<div class="product-image"><div style="height:100%;display:grid;place-items:center;color:#806c5b;font-size:12px">Image coming soon</div></div>`;
+        }
+
         const message = encodeURIComponent(`Hello DOWA Homes, I am interested in the ${item.name}.`);
-        const priceValue = item.price ?? item.price_ngn ?? null;
-        const priceMarkup = priceValue !== null && priceValue !== "" && Number.isFinite(Number(priceValue))
-          ? `<strong class="product-price">₦${Number(priceValue).toLocaleString("en-NG")}</strong>` : "";
+        const formattedPrice = formatCataloguePrice(item);
+        const priceMarkup = formattedPrice
+          ? `<strong class="product-price">${escapeHtml(formattedPrice)}</strong>`
+          : `<span class="product-price-on-request">Price on request</span>`;
+
         return `<article class="product" data-category="${escapeHtml(category)}">
           ${imageMarkup}
           <div class="product-info">
@@ -1329,19 +1592,47 @@ setInterval(() => {
         </article>`;
       }).join("");
 
-      document.querySelector(".products").innerHTML = productMarkup;
+      const productsContainer = document.querySelector(".products");
+      productsContainer.innerHTML = productMarkup;
 
-      // Rebind image preview for the newly rendered catalogue cards.
-      document.querySelectorAll(".products .preview").forEach(link => {
-        link.addEventListener("click", event => {
-          event.preventDefault();
-          const image = link.querySelector("img");
-          showImage(link.href, image?.alt || "Furniture image");
+      // Product image gallery: supports arrow clicks, swipe/scroll, and lightbox preview.
+      productsContainer.querySelectorAll("[data-catalogue-gallery]").forEach(gallery => {
+        const track = gallery.querySelector(".catalogue-gallery-track");
+        const slides = Array.from(gallery.querySelectorAll(".catalogue-gallery-slide"));
+        const dots = Array.from(gallery.querySelectorAll(".catalogue-gallery-dot"));
+        const prev = gallery.querySelector(".catalogue-gallery-prev");
+        const next = gallery.querySelector(".catalogue-gallery-next");
+        if (!track || !slides.length) return;
+
+        let activeIndex = 0;
+        const setActive = index => {
+          activeIndex = (index + slides.length) % slides.length;
+          track.scrollTo({ left: slides[activeIndex].offsetLeft, behavior: "smooth" });
+          dots.forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === activeIndex));
+        };
+        prev?.addEventListener("click", event => { event.stopPropagation(); setActive(activeIndex - 1); });
+        next?.addEventListener("click", event => { event.stopPropagation(); setActive(activeIndex + 1); });
+        track.addEventListener("scroll", () => {
+          const width = track.clientWidth || 1;
+          const index = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / width)));
+          if (index !== activeIndex) {
+            activeIndex = index;
+            dots.forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === activeIndex));
+          }
+        }, { passive: true });
+        const productImageUrls = slides.map(slide => {
+          const image = slide.querySelector("img");
+          return image ? (image.currentSrc || image.src) : "";
+        }).filter(Boolean);
+        slides.forEach((slide, index) => {
+          slide.addEventListener("click", () => {
+            if (productImageUrls.length) showCatalogueLightbox(productImageUrls, index, slides[index].querySelector("img")?.alt || "Furniture");
+          });
         });
       });
+
       applyDowaFilter("catalogueFilters", ".product", "category");
     }
-
     // Our Work: render every published project media item, including videos.
     if (projects.length) {
       const galleryMarkup = projects.map(project => {
